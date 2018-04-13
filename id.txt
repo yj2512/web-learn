@@ -1,0 +1,79 @@
+主页统一使用index.htm、index.html或index.asp文件名（小写）
+　　各子页命名的原则首先应该以栏目名的英语翻译取单一单词为名称。例如：
+关于我们 --> aboutus 
+信息反馈 --> feedback 
+产品 --> product　
+
+
+　图片的命名原则
+　　图片的名称分为头尾两部分，用下划线隔开，头部分表示此图片的大类性质
+　　例如：广告、标志、菜单、按钮等等。
+　　放置在页面顶部的广告、装饰图案等长方形的图片取名： banner
+　　标志性的图片取名为： logo
+　　在页面上位置不固定并且带有链接的小图片我们取名为 button
+　　在页面上某一个位置连续出现，性质相同的链接栏目的图片我们取名： menu
+　　装饰用的照片我们取名： pic
+　　不带链接表示标题的图片我们取名： title
+　　范例：banner_sohu.png、banner_sina.png、menu_aboutus.png、menu_job.png、title_news.png、logo_police.png、 logo_national.png、pic_people.png
+　　鼠标感应效果图片命名规范为"图片名+_+on/off"。
+　　例如：menu1_on.png、menu1_off.png
+　　javascript的命名原则
+　　例如：广告条的javascript文件名为 ad.js 弹出窗口的javascript文件名为 pop.js
+　　动态语言文件命名原则
+　　以性质_描述，描述可以有多个单词，用“_”隔开，性质一般是该页面得概要。
+　　范例：register_form.asp、register_post.asp、topic_lock.asp
+
+
+id的命名:
+页面结构
+容器: container
+页头：header
+内容：content container
+页面主体：main
+页尾：footer
+导航：nav
+侧栏：sidebar
+栏目：column
+页面外围控制整体布局宽度：wrapper
+左右中：left right center
+导航
+导航：nav
+主导航：mainbav
+子导航：subnav
+顶导航：topnav
+边导航：sidebar
+左导航：leftsidebar
+右导航：rightsidebar
+菜单：menu
+子菜单：submenu
+标题: title
+摘要: summary
+功能
+标志：logo
+广告：banner
+登陆：login
+登录条：loginbar
+注册：regsiter
+搜索：search
+功能区：shop
+标题：title
+加入：joinus
+状态：status
+按钮：btn
+滚动：scroll
+标签页：tab
+文章列表：list
+提示信息：msg
+当前的: current
+小技巧：tips
+图标: icon
+注释：note
+指南：guild
+服务：service
+热点：hot
+新闻：news
+下载：download
+投票：vote
+合作伙伴：partner
+友情链接：link
+版权：copyright
