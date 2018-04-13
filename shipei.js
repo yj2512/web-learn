@@ -29,15 +29,21 @@ $(function () {
 	
 	/*font-size可能需要额外的媒介查询，并且font-size不能使用rem，如网易的设置：
 	@media screen and (max-width:321px){
-	    .m-navlist{font-size:15px}
+	    html{
+	    	font-size:15px
+		}
 	}
 
 	@media screen and (min-width:321px) and (max-width:400px){
-	    .m-navlist{font-size:16px}
+	    html{
+	    	font-size:16px
+		}
 	}
 
 	@media screen and (min-width:400px){
-	    .m-navlist{font-size:18px}
+	    html{
+	    	font-size:18px
+		}
 	}*/
 
 	/*如果采用网易这种做法，视口要如下设置：
