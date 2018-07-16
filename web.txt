@@ -1,27 +1,27 @@
-5¡¢ÊìÏ¤ HTTP Ð­Òé¼°»º´æ£¬ÁË½â»ù±¾µÄä¯ÀÀÆ÷äÖÈ¾¼°ÍøÂç´«Êä¹ý³Ì
+5ã€ç†Ÿæ‚‰ HTTP åè®®åŠç¼“å­˜ï¼Œäº†è§£åŸºæœ¬çš„æµè§ˆå™¨æ¸²æŸ“åŠç½‘ç»œä¼ è¾“è¿‡ç¨‹
 
-6¡¢ÊìÏ¤Êý¾Ý¿â¼°SQLÓïÑÔ£¬ÁË½â×îÉÙÒ»ÃÅ¿ª·¢ÓïÑÔ¡£
+6ã€ç†Ÿæ‚‰æ•°æ®åº“åŠSQLè¯­è¨€ï¼Œäº†è§£æœ€å°‘ä¸€é—¨å¼€å‘è¯­è¨€ã€‚
 
-2.¶ÔCSS3¡¢HTML5¡¢Http1.0¡«2.0¡¢Javascript ES5¡«ES7¡¢
+2.å¯¹CSS3ã€HTML5ã€Http1.0ï½ž2.0ã€Javascript ES5ï½žES7ã€
 
-  TypeScript¡¢NodeJSµÈÖ÷Á÷Ç°¶Ë¼¼ÊõÕ»ÓÐÈ«Ãæ¡¢ÉîÈëµÄÀí½â£»
+  TypeScriptã€NodeJSç­‰ä¸»æµå‰ç«¯æŠ€æœ¯æ ˆæœ‰å…¨é¢ã€æ·±å…¥çš„ç†è§£ï¼›
 
-4.¶ÔÖ÷Á÷ä¯ÀÀÆ÷ÄÚºË¡¢Ç°¶Ë¼¼ÊõÁìÓòÏà¹ØÖªÊ¶ÓÐÈ«ÃæµÄÁË½â£¬¶ÔÄÚºË£¬ÓïÑÔ·¢Õ¹Ç÷ÊÆÓÐ×Ô¼ºµÄÀí½â
+4.å¯¹ä¸»æµæµè§ˆå™¨å†…æ ¸ã€å‰ç«¯æŠ€æœ¯é¢†åŸŸç›¸å…³çŸ¥è¯†æœ‰å…¨é¢çš„äº†è§£ï¼Œå¯¹å†…æ ¸ï¼Œè¯­è¨€å‘å±•è¶‹åŠ¿æœ‰è‡ªå·±çš„ç†è§£
 
-8.Ê¹ÓÃ¹ýbrowserify¡¢gulp¡¢webpackµÈ×Ô¶¯»¯¹¤¾ßÕßÓÅÏÈ¡£
+8.ä½¿ç”¨è¿‡browserifyã€gulpã€webpackç­‰è‡ªåŠ¨åŒ–å·¥å…·è€…ä¼˜å…ˆã€‚
 
-4¡¢ÊìÏ¤³£ÓÃUI¿Ø¼þ¿â£¨ÀýÈçEchart3£¬D3£¬ElementUI£¬IView£©¡£
+4ã€ç†Ÿæ‚‰å¸¸ç”¨UIæŽ§ä»¶åº“ï¼ˆä¾‹å¦‚Echart3ï¼ŒD3ï¼ŒElementUIï¼ŒIViewï¼‰ã€‚
 
-4¡¢ÊìÏ¤ÍøÂç±à³Ì£¬ÊìÏ¤»¥ÁªÍøÓ¦ÓÃÐ­Òé£¬ÊìÏ¤TCP/IPÐ­Òé£»
+4ã€ç†Ÿæ‚‰ç½‘ç»œç¼–ç¨‹ï¼Œç†Ÿæ‚‰äº’è”ç½‘åº”ç”¨åè®®ï¼Œç†Ÿæ‚‰TCP/IPåè®®ï¼›
 
-7¡¢ÁË½âweb3D¡¢H5ÓÎÏ·µÈÓÅÏÈ¿¼ÂÇ¡£
+7ã€äº†è§£web3Dã€H5æ¸¸æˆç­‰ä¼˜å…ˆè€ƒè™‘ã€‚
 
-8¡¢ÊìÁ·Ê¹ÓÃECharts»òÓÐÊ¹ÓÃ¹ýÆäËûÍ¼±í²å¼þ£¬ÊìÁ·ÔËÓÃCanvas/SVGÍøÒ³»æÍ¼¼¼ÊõÓÈ¼Ñ£»
+8ã€ç†Ÿç»ƒä½¿ç”¨EChartsæˆ–æœ‰ä½¿ç”¨è¿‡å…¶ä»–å›¾è¡¨æ’ä»¶ï¼Œç†Ÿç»ƒè¿ç”¨Canvas/SVGç½‘é¡µç»˜å›¾æŠ€æœ¯å°¤ä½³ï¼›
 
-9¡¢ÊìÏ¤webGL,ÓÐºó¶Ë¿ª·¢¾­ÑéÕßÓÅÏÈ(Èçnodejs»òÕßphp);
+9ã€ç†Ÿæ‚‰webGL,æœ‰åŽç«¯å¼€å‘ç»éªŒè€…ä¼˜å…ˆ(å¦‚nodejsæˆ–è€…php);
 
-10¡¢5¡¢ÓÐHTML5¿ª·¢¾­ÑéÕßÓÅÏÈ¡¢ÓÐSEOÓÅ»¯¾­ÑéÕßÓÅÏÈ¡£
+10ã€5ã€æœ‰HTML5å¼€å‘ç»éªŒè€…ä¼˜å…ˆã€æœ‰SEOä¼˜åŒ–ç»éªŒè€…ä¼˜å…ˆã€‚
 
-11¡¢* ÊìÁ·Ê¹ÓÃ°æ±¾¹ÜÀí¹¤¾ß Git£»* ´úÂëÕû½à¡¢¹æ·¶¡¢Ä£¿é»¯£»
+11ã€* ç†Ÿç»ƒä½¿ç”¨ç‰ˆæœ¬ç®¡ç†å·¥å…· Gitï¼›* ä»£ç æ•´æ´ã€è§„èŒƒã€æ¨¡å—åŒ–ï¼›
                             
-                            
+11ã€ç†Ÿæ‚‰Node.jsã€ç†Ÿæ‚‰expressã€koaç­‰webå¼€å‘æ¡†æž¶                           
