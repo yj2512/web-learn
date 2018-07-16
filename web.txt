@@ -25,3 +25,5 @@
 11、* 熟练使用版本管理工具 Git；* 代码整洁、规范、模块化；
                             
 11、熟悉Node.js、熟悉express、koa等web开发框架                           
+
+8. 熟悉HTTP1/2、Websocket等通信协议，有至少一种WebService接口规范（RestFul, Soap）经验优先。
