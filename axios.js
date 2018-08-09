@@ -1,3 +1,5 @@
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
 get 请求：
 //发起一个user请求，参数为给定的ID
 axios.get('/user?ID=1234')
