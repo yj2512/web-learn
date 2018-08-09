@@ -79,7 +79,10 @@ function getUserPermissions(){
 axios.all([getUerAccount(),getUserPermissions()])
     .then(axios.spread(function(acc,pers){
         //两个请求现在都完成
-    }));
+    })).catch(function (error) {
+	//其一失败
+		console.log(error);
+});
 
 
 
