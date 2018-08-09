@@ -27,12 +27,12 @@
 		// 1. 定义 (路由) 组件。
 		// 可以从其他文件 import 进来
 		const Foo = { template: '<div>foo</div>' }
-		const Bar = { template: '<div>bar</div>' ,
+		const Bar = { template: '<div>bar {{$route.params.name}}</div>' ,
  created(){
  	console.log(this.$route)
  }}
 	const User = {
- template: '<div>User</div>',
+ template: '<div>User {{$route.query.id}}</div>',
  created(){
  	console.log(this.$route)
  }
