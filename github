@@ -1,0 +1,67 @@
+上传文件到github
+
+1、配置个人的用户名和电子邮件地址
+
+① $ git config --global user.name "yj2512"
+
+② $ git config --global user.email "*******@qq.com"
+
+
+// 查看配置信息
+
+ $ git config --list
+
+
+2、设置SSH key
+
+① $ ssh-keygen -t rsa
+
+	Generating public/private rsa key pair.
+
+	Enter file in which to save the key (/c/Users/Administrator/.ssh/id_rsa):  E:\github\key\id_rsa    #可以不填直接回车
+
+	Enter passphrase (empty for no passphrase):   #输入密码（可以为空）
+
+	Enter same passphrase again:   #再次确认密码（可以为空）
+
+	Your identification has been saved in E:\github\key\id_rsa.   #生成的密钥
+
+	Your public key has been saved in E:\github\key\id_rsa.pub.  #生成的公钥
+
+②为github账号配置ssh key  Public仓库配置id_rsa.pub    Private仓库配置id_rsa
+
+
+
+3、上传本地文件
+
+① $ git clone https://github.com/yj2512/WeChat-small-program.git  //克隆远程仓库
+
+② $ cd e:github   (e:github 为文件夹路径 e盘的github文件)   //进入文件夹
+
+③ $ git init           //初始化仓库  成功后文件夹下增加一个隐藏的.git文件
+
+④ $ git add .   //add 和后面的点隔空格,点表示将目录下的文件全部上传
+
+⑤ $ git commit -m "XXXXXXXX"    //添加文件的描述
+
+⑥ $ git remote add origin https://github.com/yj2512/WeChat-small-program.git   		//关联到github仓库
+
+⑦ $ git push -u origin master   上传本地文件
+
+	//成功会提示输入github的账号密码
+
+	完成上传
+
+一些可能遇到的问题解决：
+
+
+
+如果输入$ git remote add origin git@github.com:djqiang（github帐号名）/gitdemo（项目名）.git
+
+提示出错信息：fatal: remote origin already exists.
+
+解决办法如下：
+
+1、先输入$ git remote rm origin
+
+2、再输入$ git remote add origin git@github.com:djqiang/gitdemo.git 就不会报错了！
