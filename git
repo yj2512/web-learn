@@ -1,0 +1,41 @@
+[master 主线状态]
+
+git checkout -b branch_issue
+
+[branch_issue 分支状态]
+
+...
+
+git add .
+
+git commit -m "xxxx"
+
+git push origin branch_issue
+
+git checkout master
+
+[master 主线状态]
+
+git pull [origin master]
+
+{
+
+	成功：不用做
+
+	失败：[1]手动修改失败的文件，调整好失败的文件。
+
+		  [2]git  add .
+
+		  [3]git commit -m "xxxxx"
+
+}
+
+git merge branch_issue
+
+{
+
+	:wq 
+
+}
+
+git push [origin master]
