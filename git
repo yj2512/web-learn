@@ -1,3 +1,20 @@
+git pull命令的作用是：取回远程主机某个分支的更新，再与本地的指定分支合并。
+git pull <远程主机名> <远程分支名>:<本地分支名>
+
+git pull origin master:brantest
+将远程主机origin的master分支拉取过来，与本地的brantest分支合并。
+
+后面的冒号可以省略：
+git pull origin master
+
+上面的pull操作用fetch表示为：
+git fetch origin master:brantest
+git merge brantest
+
+
+
+
+
 [master 主线状态]
 
 git checkout -b branch_issue
