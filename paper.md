@@ -53,6 +53,41 @@
 
 		// new MyPromise((resolve, reject)=> {resolve(1)}).then((res)=>{console.log(res)})
 
+		// Promise.all
+		Promise.myAll = function(promiseArr) {
+			return new Promise((resolve, reject) => {
+				const ans = [];
+				let index = 0;
+				for (let i = 0; i < promiseArr.length; i++) {
+					promiseArr[i]
+					.then(res => {
+						ans[i] = res;
+						index++;
+						if (index === promiseArr.length) {
+							resolve(ans);
+						}
+					})
+					.catch(err => reject(err));
+				}
+			})
+		}
+
+		// Promise.race
+		Promise.race = function(promiseArr) {
+			return new Promise((resolve, reject) => {
+				promiseArr.forEach(p => {
+					// 如果不是Promise实例需要转化为Promise实例
+					Promise.resolve(p).then(
+						val => resolve(val),
+						err => reject(err),
+					)
+				})
+			})
+		}
+
+
+
+
 2、DOM操作——怎样添加、移除、移动、复制、创建和查找节点
 	（1）创建新节点
 		createDocumentFragment()    //创建一个DOM片段
@@ -81,6 +116,10 @@
 
 	defer和async、动态创建DOM方式（创建script，插入到DOM中，加载完毕后callBack）、按需异步载入js
 
+	async:开启另外一个线程下载js文件(并行进行下载)，下载完成，立马执行。（此时才发生阻塞）
+
+	defer:开启另一个线程下载js文件,直到页面加载完成时才执行。（根本不阻塞）
+
 5、数组去重
 	Array.from(new Set(array)); 
 
@@ -107,6 +146,10 @@
 	事件流是网页元素接收事件的顺序，"DOM2级事件"规定的事件流包括三个阶段：事件捕获阶段、处于目标阶段、事件冒泡阶段。
 
 	阻止冒泡： event.stopPropagation()  event.cancelBubble
+
+	事件委托 事件委托是指将事件绑定目标元素的到父元素上，利用冒泡机制触发该事件
+	event.target返回触发事件的元素
+	event.currentTarget返回绑定事件的元素
 
 9、事件是如何实现的？
 
@@ -138,6 +181,34 @@
 12、什么是防抖和节流
 	防抖(debounce)——触发高频事件后 n 秒后函数只会执行一次，如果 n 秒内高频事件再 次被触发，则重新计算时间;
 	节流(throttle)——高频事件触发，但在 n 秒内只会执行一次，所以节流会稀释函数的执 行频率。
+
+	function debounce(fn,wait=300){
+    let timer
+    return function(){
+      if(timer){
+          clearTimeOut(timer)
+      }
+      timer=setTimeOut(()=>{
+          fn.apply(this,arguments)
+      },wait)
+    } 
+	}
+
+	function throttle(fn, wait = 300) {
+        let prev = +new Date();
+        return function () {
+          const args = argument,
+          now = +new Date();
+          if (now > prev + wait) {
+            prev = now;
+            fn.apply(this, args)
+          }
+        }
+     }
+
+
+
+
 
 13、介绍下 Set、Map、WeakSet 和 WeakMap 的区别？
 	Set——对象允许你存储任何类型的唯一值，无论是原始值或者是对象引用 
@@ -280,7 +351,7 @@
 		delete context[fnSymbol];
 	}
 
-	// apply
+	// apply   第二个参数是一个数组
 	Function.prototype.apply = function (context, argsArr) {
 		context = context || window;
 		
@@ -333,6 +404,11 @@
 	JSON.stringify(function () {}); // null
 	JSON.stringify([1, undefined, 2, function () {}, 3]); // "1, null, 2, null, 3"
 	JSON.stringify({ a: 2, b: function () {} }); // "{"a":2}"
+
+	值为undefined会被省略掉
+	Date类型会变成字符串类型
+	RegExp、Error对象识别不了，只能得到空对象
+	NaN、Infinity和-Infinity，则序列化的结果会变成null
 
 29、JSON.stringify 的第二个参数
 	(1) 当 replacer 是一个数组时，那么他必须是一个字符串数组，其中包含序列化要处理的对象的属性名称，除此之外的属性就会被忽略
@@ -528,6 +604,7 @@
 		},
 
 41、Vue 是如何实现数据双向绑定的？
+	（vue.js 是采用数据劫持结合发布者-订阅者模式的方式）
 	Vue 主要通过以下 4 个步骤来实现数据双向绑定的：
 
 	实现一个监听器 Observer：对数据对象进行遍历，包括子属性对象的属性，利用 Object.defineProperty() 对属性都加上 setter 和 getter。这样的话，给这个对象的某个值赋值，就会触发 setter，那么就能监听到了数据变化。
@@ -560,6 +637,9 @@
 	（3）ViewModel 层
 		（前端业务代码逻辑）
 		由 ViewModel 负责与 Model 层交互，这就完全解耦了 View 层和 Model 层，这个解耦是至关重要的，它是前后端分离方案实施的重要一环。
+		
+
+		在 JQuery 时期，如果需要刷新 UI 时，需要先取到对应的 DOM 再更新 UI，这样数据和业务的逻辑就和页面有强耦合。
 
 44、虚拟 DOM 实现原理？
 
@@ -673,10 +753,10 @@
 	强制刷新页面(Ctrl+F5) - 浏览器会直接忽略本地的缓存(有缓存也会认为本地没有缓存)，在请求中加上字段：Cache-Control:no-cache (或 Pragma:no-cache)，发包向服务重新拉取文件。
 
 53、CORS是一个W3C标准，全称是”跨域资源共享”（Cross-origin resource sharing）
-		设置请求头部，Access-Control-Allow-Origin 等头部信息
+		设置请求头部，Access-Control-Allow-Origin（该属性表示哪些域名可以访问资源，如果设置通配符则表示所有网站都可以访问资源。） 等头部信息
 
 54、XSS 与 CSRF 两种跨站攻击
-	xss 跨站脚本攻击，主要是前端层面的，用户在输入层面插入攻击脚本，改变页面的显示，或则窃取网站 cookie，
+	xss 跨站脚本攻击（英语：Cross-site Scripting），主要是前端层面的，用户在输入层面插入攻击脚本，改变页面的显示，或则窃取网站 cookie，
 	预防方法：不相信用户的所有操作，对用户输入进行一个转义，不允许 js 对 cookie 的读写
 
 	csrf 跨站请求伪造（英语：Cross-site request forgery），以你的名义，发送恶意请求，通过 cookie 加参数等形式过滤，简单点说，CSRF 就是利用用户的登录态发起恶意请求。
@@ -685,5 +765,330 @@
 	1. 不让第三方网站访问到用户 Cookie
 	2. 阻止第三方网站请求接口
 	3. 请求时附带验证信息，比如验证码或者 token
+	4. 将cookie设置为HttpOnly(不能通过 JS 访问 Cookie，减少 XSS 攻击)
 
 55、Object.keys()  Object.values()  Object.entries()
+
+56、深拷贝的方法：
+
+		自己实现函数，递归实现；遍历对象的key，值是对象重新new对象赋值
+		lodash里面的 _.cloneDeep()
+		JSON.parse(JSON.stringify())
+
+		浅拷贝的方法：
+
+		ES6解构赋值 ... 和 slice(0)
+		Object.assign
+		lodash 里面 _.clone()
+
+57、window.onload 和 DOMContentLoaded 区别
+		 window.addEventListener('load', ()=>{
+      //页面全部资源加载完才会执行，包括图片、视频等
+      console.log("load");
+  })
+
+  window.addEventListener('DOMContentLoaded', ()=>{
+      //DOM 渲染完即可执行，此时图片、视频还可能没有加载完
+      console.log("DOMContentLoaded")
+  })
+
+58、浏览器缓存
+		（1）强制缓存
+			- expires: http1.0的产物；根据一个绝对时间来确定是否要利用缓存；
+			- cache-control: http1.1的产物，根据一个相对时间来确定是否利用缓存。
+			- 两者同时存在，cache-control生效；expires是兼容性写法。
+
+			1. no-cache：需要进行协商缓存，发送请求到服务器确认是否使用缓存。
+			2. no-store：禁止使用缓存，每一次都要重新请求数据。
+			3. public：可以被所有的用户缓存，包括终端用户和 CDN 等中间代理服务器。
+			4. private：只能被终端用户的浏览器缓存，不允许 CDN 等中继缓存服务器对其缓存
+			5. max-age>0 时 直接从游览器缓存中 提取
+			6. max-age<=0 时 向server 发送http 请求确认 ,该资源是否有修改; 有的话 返回200 ,无的话 返回304.
+
+59、三次握手
+		所谓三次握手（Three-Way Handshake）即建立TCP连接，就是指建立一个TCP连接时，需要客户端和服务端总共发送3个包以确认连接的建立。在socket编程中，这一过程由客户端执行connect来触发
+		（1）Client将标志位SYN置为1，随机产生一个值seq=J，并将该数据包发送给Server，Client进入SYN_SENT状态，等待Server确认。
+		（2）第二次握手：Server收到数据包后由标志位SYN=1知道Client请求建立连接，Server将标志位SYN和ACK都置为1，ack=J+1，随机产生一个值seq=K，并将该数据包发送给Client以确认连接请求，Server进入SYN_RCVD状态。
+		（3）第三次握手：Client收到确认后，检查ack是否为J+1，ACK是否为1，如果正确则将标志位ACK置为1，ack=K+1，并将该数据包发送给Server，Server检查ack是否为K+1，ACK是否为1，如果正确则连接建立成功，Client和Server进入ESTABLISHED状态，完成三次握手，随后Client与Server之间可以开始传输数据了。
+
+		简单来说，就是
+		1、建立连接时，客户端发送SYN包（SYN=i）到服务器，并进入到SYN-SEND状态，等待服务器确认
+		2、服务器收到SYN包，必须确认客户的SYN（ack=i+1）,同时自己也发送一个SYN包（SYN=k）,即SYN+ACK包，此时服务器进入SYN-RECV状态
+		3、客户端收到服务器的SYN+ACK包，向服务器发送确认报ACK（ack=k+1）,此包发送完毕，客户端和服务器进入ESTABLISHED状态，完成三次握手，客户端与服务器开始传送数据。
+
+		SYN （同步序列编号）ACK（确认字符）
+
+
+		为什么不是两次？
+		无法确认客户端的接收能力。
+
+
+
+		（TCP 握手结束后会进行 TLS 握手，然后就开始正式的传输数据）
+		HTTPS 握手
+		HTTPS 还是通过了 HTTP 来传输信息，但是信息通过 TLS 协议进行了加密。
+
+		TLS 协议位于传输层之上，应用层之下。首次进行 TLS 协议传输需要两个 RTT ，接下来可以通过 Session Resumption 减少到一个 RTT。
+		在 TLS 中使用了两种加密技术，分别为：对称加密和非对称加密。
+
+		对称加密：
+
+		对称加密就是两边拥有相同的秘钥，两边都知道如何将密文加密解密。
+
+		非对称加密：
+
+		有公钥私钥之分，公钥所有人都可以知道，可以将数据用公钥加密，但是将数据解密必须使用私钥解密，私钥只有分发公钥的一方才知道。
+		
+
+
+60、四次挥手
+		所谓四次挥手（Four-Way Wavehand）即终止TCP连接，就是指断开一个TCP连接时，需要客户端和服务端总共发送4个包以确认连接的断开。在socket编程中，这一过程由客户端或服务端任一方执行close来触发
+
+		（1）第一次挥手：Client发送一个FIN，用来关闭Client到Server的数据传送，Client进入FIN_WAIT_1状态。
+		（2）第二次挥手：Server收到FIN后，发送一个ACK给Client，确认序号为收到序号+1（与SYN相同，一个FIN占用一个序号），Server进入CLOSE_WAIT状态。
+		（3）第三次挥手：Server发送一个FIN，用来关闭Server到Client的数据传送，Server进入LAST_ACK状态。
+		（4）第四次挥手：Client收到FIN后，Client进入TIME_WAIT状态，接着发送一个ACK给Server，确认序号为收到序号+1，Server进入CLOSED状态，完成四次挥手。
+
+61、关于横屏
+		js识别
+		window.addEventListener("resize", ()=>{
+				if (window.orientation === 180 || window.orientation === 0) { 
+					// 正常方向或屏幕旋转180度
+						console.log('竖屏');
+				};
+				if (window.orientation === 90 || window.orientation === -90 ){ 
+					// 屏幕顺时钟旋转90度或屏幕逆时针旋转90度
+						console.log('横屏');
+				}  
+		});
+
+		css识别
+		@media screen and (orientation: portrait) {
+			/*竖屏...*/
+		} 
+		@media screen and (orientation: landscape) {
+			/*横屏...*/
+		}
+
+62、beforeCreate    在实例初始化之后，数据观测 (data observer) 和 event/watcher 事件配置之前被调用。
+		created   			在实例创建完成后被立即调用。在这一步，实例已完成以下的配置：数据观测 (data observer)，property 和方法的运算，watch/event 事件回调。然而，挂载阶段还没开始，$el property 目前尚不可用。
+
+63、打印出当前网页使用了多少种HTML元素
+		const fn = () => {
+			return [...new Set([...document.querySelectorAll('*')].map(el => el.tagName))].length;
+		}
+
+64、预加载
+		预先加载利用浏览器空闲时间请求将来要使用的资源，以便用户访问下一页面时更快地响应。
+
+65、划分内容到不同域名
+		浏览器一般会限制每个域的并行线程（一般为6个，甚至更少），使用不同的域名可以最大化下载线程，但注意保持在2-4个域名内，以避免DNS查询损耗。
+		例如，动态内容放在csspod.com上，静态资源放在static.csspod.com上。这样还可以禁用静态资源域下的Cookie，减少数据传输
+
+66、从HTTP/1.1开始，web客户端就有了支持压缩的Accept-Encoding HTTP请求头。
+		Accept-Encoding: gzip, deflate
+
+		如果web服务器看到这个请求头，它就会用客户端列出的一种方式来压缩响应。web服务器通过Content-Encoding响应头来通知客户端。
+		Content-Encoding: gzip
+
+67、cookie
+		属性					作用
+
+		value 				如果用于保存用户登录态，应该将该值加密，不能使用明文的用户标识
+		http-only			不能通过 JS 访问 Cookie，减少 XSS 攻击
+		secure				只能在协议为 HTTPS 的请求中携带
+		same-site			规定浏览器不能在跨域请求中携带 Cookie，减少 CSRF 攻击
+
+68、从输入 URL 到页面加载全过程
+		1. 首先做 DNS 查询，如果这一步做了智能 DNS 解析的话，会提供访问速度最快的 IP 地址回来
+		2. 接下来是 TCP 握手，应用层会下发数据给传输层，这里 TCP 协议会指明两端的端口号，然后下发给网络层。网络层中的 IP 协议会确定 IP 地址，并且指示了数据传输中如何跳转路由器。然后包会再被封装到数据链路层的数据帧结构中，最后就是物理层面的传输了
+		3. TCP 握手结束后会进行 TLS 握手，然后就开始正式的传输数据
+		4. 数据在进入服务端之前，可能还会先经过负责负载均衡的服务器，它的作用就是将请求合理的分发到多台服务器上，这时假设服务端会响应一个 HTML 文件
+		5. 首先浏览器会判断状态码是什么，如果是 200 那就继续解析，如果 400 或 500 的话就会报错，如果 300 的话会进行重定向，这里会有个重定向计数器，避免过多次的重定向，超过次数也会报错
+		6. 浏览器开始解析文件，如果是 gzip 格式的话会先解压一下，然后通过文件的编码格式知道该如何去解码文件
+		7. 文件解码成功后会正式开始渲染流程，先会根据 HTML 构建 DOM 树，有 CSS 的话会去构建 CSSOM 树。如果遇到 script 标签的话，会判断是否存在 async 或者 defer ，前者会并行进行下载并执行 JS，后者会先下载文件，然后等待 HTML 解析完成后顺序执行，如果以上都没有，就会阻塞住渲染流程直到 JS 执行完毕。遇到文件下载的会去下载文件，这里如果使用 HTTP 2.0 协议的话会极大的提高多图的下载效率。
+		8. 初始的 HTML 被完全加载和解析后会触发 DOMContentLoaded 事件
+		9. CSSOM 树和 DOM 树构建完成后会开始生成 Render 树，这一步就是确定页面元素的布局、样式等等诸多方面的东西
+		10. 在生成 Render 树的过程中，浏览器就开始调用 GPU 绘制，合成图层，将内容显示在屏幕上了
+
+69、Nginx更擅长于底层服务器端资源的处理（静态资源处理转发、反向代理，负载均衡等），Node.js更擅长于上层具体业务逻辑的处			理。两者可以实现完美组合，助力前端开发。
+
+		什么是反向代理？ 互联网应用基本都基于CS基本结构，即client端和server端。代理其实就是在client端和真正的server端之前增加一层提供特定服务的服务器，即代理服务器。
+
+		解决跨域：现在前端成熟的做法，一般是把node proxy server集成进来。事实上，用Nginx同样可以解决问题
+
+		负载均衡是反向代理的一种，后端多台服务器，nginx根据权重、压力、带宽的分配服务器，避免等待和拥塞
+		
+		动静分离是反向代理的一种，后端服务器分为动态资源服务器和静态资源服务器，nginx会根据请求分配服务器，区分处理逻辑，加快响应
+
+70、为什么会首屏白屏
+		浏览器渲染包含 HTML 解析、DOM 树构建、CSSOM 构建、JavaScript 解析、布局、绘制等等
+		因为要等待文件加载、CSSOM 构建、JS 解析等过程，而这些过程比较耗时，导致用户会长时间出于不可交互的首屏灰白屏状态
+
+71、浏览器在什么情况下会发起options预检请求？
+		在非简单请求且跨域的情况下，浏览器会发起options预检请求。
+
+		关于简单请求和复杂请求：
+		1. 简单请求
+
+			简单请求需满足以下两个条件
+
+			请求方法是以下三种方法之一：
+			HEAD
+			GET
+			POST
+			HTTP 的头信息不超出以下几种字段
+			Accept
+			Accept-Language
+			Content-Language
+			Last-Event-ID
+			Content-Type: 只限于 (application/x-www-form-urlencoded、multipart/form-data、text/plain)
+		2. 复杂请求
+
+			非简单请求即是复杂请求
+
+			常见的复杂请求有：
+
+			请求方法为 PUT 或 DELETE
+
+			Content-Type 字段类型为 application/json
+
+			添加额外的http header 比如access_token
+
+			在跨域的情况下，非简单请求会先发起一次空body的OPTIONS请求，称为"预检"请求，用于向服务器请求权限信息，等预检请求被成功响应后，才发起真正的http请求。
+
+72、渐进增强和优雅降级
+		优雅降级一开始就构建完整的功能，然后再针对低版本浏览器进行兼容。。
+		
+		渐进增强针对低版本浏览器进行构建页面，保证最基本的功能，然后再针对高级浏览器进行效果、交互等改进和追加功能达到更好的用户体验。
+
+73、Virtual DOM 真的比操作原生 DOM 快吗？
+		1. 原生 DOM 操作 vs. 通过框架封装操作。
+
+			这是一个性能 vs. 可维护性的取舍。框架的意义在于为你掩盖底层的 DOM 操作，让你用更声明式的方式来描述你的目的，从而让你的代码更容易维护。没有任何框架可以比纯手动的优化 DOM 操作更快，因为框架的 DOM 操作层需要应对任何上层 API 可能产生的操作，它的实现必须是普适的。针对任何一个 benchmark，我都可以写出比任何框架更快的手动优化，但是那有什么意义呢？在构建一个实际应用的时候，你难道为每一个地方都去做手动优化吗？出于可维护性的考虑，这显然不可能。框架给你的保证是，你在不需要手动优化的情况下，我依然可以给你提供过得去的性能。
+
+			我们可以比较一下 innerHTML vs. Virtual DOM 的重绘性能消耗：
+
+			innerHTML: render html string O(template size) + 重新创建所有 DOM 元素 O(DOM size)
+			Virtual DOM: render Virtual DOM + diff O(template size) + 必要的 DOM 更新 O(DOM change)
+
+			Virtual DOM render + diff 显然比渲染 html 字符串要慢，但是！它依然是纯 js 层面的计算，比起后面的 DOM 操作来说，依然便宜了太多。可以看到，innerHTML 的总计算量不管是 js 计算还是 DOM 操作都是和整个界面的大小相关，但 Virtual DOM 的计算量里面，只有 js 计算和界面大小相关，DOM 操作是和数据的变动量相关的。前面说了，和 DOM 操作比起来，js 计算是极其便宜的。这才是为什么要有 Virtual DOM：它保证了 1）不管你的数据变化多少，每次重绘的性能都可以接受；2) 你依然可以用类似 innerHTML 的思路去写你的应用。
+
+
+74、CDN的全称是 Content Delivery Network，即内容分发网络。
+		CDN 是构建在网络之上的内容分发网络，依靠部署在各地的边缘服务器，通过中心平台的负载均衡、内容分发、调度等功能模块，使用户就近获取所需内容，降低网络拥塞，提高用户访问响应速度和命中率。CDN 的关键技术主要有内容存储和分发技术。
+
+		CDN 的优势
+		1. CDN 节点解决了跨运营商和跨地域访问的问题，访问延时大大降低；
+		2. 大部分请求在 CDN 边缘节点完成，CDN 起到了分流作用，减轻了源站的负载；
+		3. 降低“广播风暴”的影响，提高网络访问的稳定性；节省骨干网带宽，减少带宽需求量。
+
+
+		CDN(Content Delivery Network)就是利用DNS的重定向技术，DNS服务器会返回一个跟 用户最接近的点的IP地址给用户，CDN节点的服务器负责响应用户的请求，提供所需的内容。
+
+75、HTTPS 是什么？具体流程
+		HTTPS 是在 HTTP 和 TCP 之间建立了一个安全层，HTTP 与 TCP 通信的时候，必须先进过一个安全层，对数据包进行加密，然后将加密后的数据包传送给 TCP，相应的 TCP 必须将数据包解密，才能传给上面的 HTTP。
+
+		浏览器传输一个 client_random 和加密方法列表，服务器收到后，传给浏览器一个 server_random、加密方法列表和数字证书（包含了公钥），然后浏览器对数字证书进行合法验证，如果验证通过，则生成一个 pre_random，然后用公钥加密传给服务器，服务器用 client_random、server_random 和 pre_random ，使用公钥加密生成 secret，然后之后的传输使用这个 secret 作为秘钥来进行数据的加解密。
+
+
+76、你对 TCP 滑动窗口有了解嘛？
+
+		在 TCP 链接中，对于发送端和接收端而言，TCP 需要把发送的数据放到发送缓存区, 将接收的数据放到接收缓存区。而经常会存在发送端发送过多，而接收端无法消化的情况，所以就需要流量控制，就是在通过接收缓存区的大小，控制发送端的发送。如果对方的接收缓存区满了，就不能再继续发送了。而这种流量控制的过程就需要在发送端维护一个发送窗口，在接收端维持一个接收窗口。
+
+		TCP 滑动窗口分为两种: 发送窗口和接收窗口。
+
+77、TCP 如何保证有效传输及拥塞控制原理。
+		tcp 是面向连接的、可靠的、传输层通信协议
+
+		可靠体现在：有状态、可控制
+
+		1. 有状态是指 TCP 会确认发送了哪些报文，接收方受到了哪些报文，哪些没有收到，保证数据包按序到达，不允许有差错
+		2. 可控制的是指，如果出现丢包或者网络状况不佳，则会跳转自己的行为，减少发送的速度或者重发
+
+78、谈一谈你对HTTP/2理解
+		1. 头部压缩
+				HTTP 2.0 使用 HPACK 算法进行压缩。
+		2. 多路复用
+				HTTP 1.x 中，如果想并发多个请求，必须使用多个 TCP 链接，且浏览器为了控制资源，还会对单个域名有 6-8个的TCP链接请求限制。
+				HTTP2中：
+
+				同域名下所有通信都在单个连接上完成。
+				单个连接可以承载任意数量的双向数据流。
+				数据流以消息的形式发送，而消息又由一个或多个帧组成，多个帧之间可以乱序发送，因为根据帧首部的流标识可以重新组装，也就是Stream ID，流标识符，有了它，接收方就能从乱序的二进制帧中选择ID相同的帧，按照顺序组装成请求/响应报文。
+
+		3. 服务器推送（server push）
+
+		4. 二进制分帧
+
+
+		http1.1 改进:
+
+			1. 长连接(默认 keep-alive)，复用
+			2. host 字段指定对应的虚拟站点
+			3. 新增功能:
+					断点续传
+					身份认证
+					状态管理
+					cache 缓存
+						Cache-Control
+						Expires
+						Last-Modified
+						Etag
+
+79、DNS  (域名服务器)
+		1. DNS域名系统，是应用层协议，运行UDP协议之上，使用端口43。
+		2. 查询过程，本地查询是递归查询，依次通过浏览器缓存 —>> 本地hosts文件 —>> 本地DNS解析器 —>>本地DNS服务器 —>> 其他域名服务器请求。 接下来的过程就是迭代过程。
+		3. 递归查询一般而言，发送一次请求就够，迭代过程需要用户发送多次请求。
+
+		「DNS 使用 UDP 协议作为传输层协议的主要原因是为了避免使用 TCP 协议时造成的连接时延。」
+
+80、介绍一下Connection:keep-alive
+		我们知道HTTP协议采用“请求-应答”模式，当使用普通模式，即非KeepAlive模式时，每个请求/应答客户和服务器都要新建一个连接，完成 之后立即断开连接（HTTP协议为无连接的协议）；
+		
+		当使用Keep-Alive模式（又称持久连接、连接重用）时，Keep-Alive功能使客户端到服 务器端的连接持续有效，当出现对服务器的后继请求时，Keep-Alive功能避免了建立或者重新建立连接。
+
+		keep-alive技术的创建目的，能在多次HTTP之前重用同一个TCP连接，从而减少创建/关闭多个 TCP 连接的开销（包括响应时间、CPU 资源、减少拥堵等）
+
+		客户端如何开启
+		在HTTP/1.0协议中，默认是关闭的，需要在http头加入"Connection: Keep-Alive”，才能启用Keep-Alive；
+		http 1.1中默认启用Keep-Alive，如果加入"Connection: close “，才关闭。
+
+81、Last-Modified
+		这个字段表示的是「最后修改时间」。在浏览器第一次给服务器发送请求后，服务器会在响应头中加上这个字段。
+		浏览器接收到后，「如果再次请求」，会在请求头中携带If-Modified-Since字段，这个字段的值也就是服务器传来的最后修改时间。
+		服务器拿到请求头中的If-Modified-Since的字段后，其实会和这个服务器中该资源的最后修改时间对比:
+
+			1. 如果请求头中的这个值小于最后修改时间，说明是时候更新了。返回新的资源，跟常规的HTTP请求响应的流程一样。
+			2. 否则返回304，告诉浏览器直接使用缓存。
+
+82、浏览器缓存的位置的话，可以分为四种,优先级从高到低排列分别
+
+		1. Service Worker
+		2. Memory Cache
+		3. Disk Cache
+		4. Push Cache
+
+84、谈一谈你对URL理解
+		统一资源定位符的简称，Uniform Resource Locator
+
+		URL 编码
+		URL 只能使用 ASCII 字符集来通过因特网进行发送。
+		由于 URL 常常会包含 ASCII 集合之外的字符，URL 必须转换为有效的 ASCII 格式。
+		URL 编码使用 "%" 其后跟随两位的十六进制数来替换非 ASCII 字符。
+		URL 不能包含空格。URL 编码通常使用 + 来替换空格。
+
+85、正向代理和反向代理
+
+		正向代理
+			我们常说的代理也就是指正向代理，正向代理的过程，它隐藏了真实的请求客户端，服务端不知道真实的客户端是谁，客户端请求的服务都被代理服务器代替来请求。
+		反向代理
+			这种代理模式下，它隐藏了真实的服务端，当我们向一个网站发起请求的时候，背后可能有成千上万台服务器为我们服务，具体是哪一台，我们不清楚，我们只需要知道反向代理服务器是谁就行，而且反向代理服务器会帮我们把请求转发到真实的服务器那里去，一般而言反向代理服务器一般用来实现负载平衡。
+
+86、负载平衡的两种实现方式？
+		1. 一种是使用反向代理的方式，用户的请求都发送到反向代理服务上，然后由反向代理服务器来转发请求到真实的服务器上，以此来实现集群的负载平衡。
+		2. 另一种是 DNS 的方式，DNS 可以用于在冗余的服务器上实现负载平衡。因为现在一般的大型网站使用多台服务器提供服务，因此一个域名可能会对应多个服务器地址。当用户向网站域名请求的时候，DNS 服务器返回这个域名所对应的服务器 IP 地址的集合，但在每个回答中，会循环这些 IP 地址的顺序，用户一般会选择排在前面的地址发送请求。以此将用户的请求均衡的分配到各个不同的服务器上，这样来实现负载均衡。这种方式有一个缺点就是，由于 DNS 服务器中存在缓存，所以有可能一个服务器出现故障后，域名解析仍然返回的是那个 IP 地址，就会造成访问的问题。
+
+		DNS负载均衡(DNS重定向) DNS负载均衡技术的实现原理是在DNS服务器中为同一个主机名配置多个IP地址，在应答DNS查询时， DNS服务器对每个查询将以DNS文件中主机记录的IP地址按顺序返回不同的解析结果，将客户端的访问 引导到不同的机器上去，使得不同的客户端访问不同的服务器，从而达到负载均衡的目的。
+
+
