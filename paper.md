@@ -183,6 +183,24 @@
 			if
 			三元表达式
 			|| （逻辑或） && （逻辑与）左边的操作数 !(逻辑非)
+			
+	
+	== 和 === 有什么区别？
+	=== 不需要进行类型转换，只有类型相同并且值相等时，才返回 true.
+	== 如果两者类型不同，首先需要进行类型转换。具体流程如下:
+		1. 首先判断两者类型是否相同，如果相等，判断值是否相等.
+		2. 如果类型不同，进行类型转换
+		3. 判断比较的是否是 null 或者是 undefined, 如果是, 返回 true .
+		4. 判断两者类型是否为 string 和 number, 如果是, 将字符串转换成 number
+		5. 判断其中一方是否为 boolean, 如果是, 将 boolean 转为 number 再进行判断
+		6. 判断其中一方是否为 object 且另一方为 string、number 或者 symbol , 如果是, 将 object 转为原始类型再进行判断
+		let person1 = {
+		    age: 25
+		}
+		let person2 = person1;
+		person2.gae = 20;
+		console.log(person1 === person2); //true,注意复杂数据类型，比较的是引用地址
+
 
 11、['1', '2', '3'].map(parseInt)   输出
 
