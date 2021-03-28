@@ -1120,3 +1120,27 @@
 86、简述下对 webWorker 的理解？
 	HTML5则提出了 Web Worker 标准，表示js允许多线程，但是子线程完全受主线程控制并且不能操作dom，只有主线程可以操作dom，所以js本质上依然是单线程语言。
 
+87、new的原理是什么？通过new的方式创建对象和通过字面量创建有什么区别？
+  new:
+    1. 创建一个新对象
+    2. 这个新对象会被执行[[原型]]连接。
+    3. 属性和方法被加入到 this 引用的对象中。并执行了构造函数中的方法.
+    4. 如果函数没有返回其他对象，那么返回创建的这个新对象，否则返回构造函数的执行结果。
+    function new() {
+        let target = {};
+        let [constructor, ...args] = [...argument];
+        target.__proto__ = constructor.prototype;
+        let res = func.apply(target, args);
+        if ((res && typeof res == "object") || typeof(res) == "function") {
+          return res;
+        }
+        return target;
+    }
+
+  字面量创建对象，不会调用 Object构造函数, 简洁且性能更好;
+  new Object() 方式创建对象本质上是方法调用，涉及到在proto链中遍历该方法，当找到该方法后，又会生产方法调用必须的 堆栈信息，方法调用结束后，还要释放该堆栈，性能不如字面量的方式。
+
+  通过对象字面量定义对象时，不会调用Object构造函数。
+
+88、谈谈你对原型的理解？
+  在 JavaScript 中，每当定义一个对象（函数也是对象）时候，对象中都会包含一些预定义的属性。其中每个函数对象都有一个prototype 属性，这个属性指向函数的原型对象。使用原型对象的好处是所有对象实例共享它所包含的属性和方法。
