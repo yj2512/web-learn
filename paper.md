@@ -140,6 +140,14 @@
 
 	基本类型：Number、Boolean、String、null、undefined、symbol（ES6 新增的），
 	BigInt（ES2020） 引用类型：Object，对象子类型（Array，Function）
+	
+	JS中类型转换分为 强制类型转换 和 隐式类型转换 。
+		通过 Number()、parseInt()、parseFloat()、toString()、String()、Boolean(),进行强制类型转换。
+
+		逻辑运算符(&&、 ||、 !)、运算符(+、-、*、/)、关系操作符(>、 <、 <= 、>=)、相等运算符(==)或者 if/while 的条件，可能会进行隐式类型转换。
+		
+		String() 的转换规则与 toString() 基本一致，最大的一点不同在于 null 和 undefined，使用 String 进行转换，null 和 undefined对应的是字符串 'null' 和 'undefined'
+
 
 8、事件流
 
@@ -1091,4 +1099,6 @@
 
 		DNS负载均衡(DNS重定向) DNS负载均衡技术的实现原理是在DNS服务器中为同一个主机名配置多个IP地址，在应答DNS查询时， DNS服务器对每个查询将以DNS文件中主机记录的IP地址按顺序返回不同的解析结果，将客户端的访问 引导到不同的机器上去，使得不同的客户端访问不同的服务器，从而达到负载均衡的目的。
 
+86、简述下对 webWorker 的理解？
+	HTML5则提出了 Web Worker 标准，表示js允许多线程，但是子线程完全受主线程控制并且不能操作dom，只有主线程可以操作dom，所以js本质上依然是单线程语言。
 
