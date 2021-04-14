@@ -220,6 +220,17 @@
     } 
 	}
 
+//   ------------
+		function debounce(fn,wait=300){
+    var timer = null;
+    return function(){
+        if(timer){
+            clearTimeout(timer);
+        }
+        timer = setTimeout(fn,wait);
+    }
+}
+
 	function throttle(fn, wait = 300) {
         let prev = +new Date();
         return function () {
@@ -366,7 +377,7 @@
 		micro-task(微任务)：Promise，process.nextTick(node)
 
 25、手写 bind、apply、call
-	// call
+	// call call 和 apply 的功能相同，都是改变 this 的执行，并立即执行函数。区别在于传参方式不同。
 	Function.prototype.call = function (context, ...args) {
 		context = context || window;
 		
@@ -781,6 +792,8 @@
 53、CORS是一个W3C标准，全称是”跨域资源共享”（Cross-origin resource sharing）
 		设置请求头部，Access-Control-Allow-Origin（该属性表示哪些域名可以访问资源，如果设置通配符则表示所有网站都可以访问资源。） 等头部信息
 
+		复杂请求在发生请求时, 如果是 CORS 请求，浏览器预先发送一个 option 请求。浏览器这种行为被称之为预检请求（注意如果不是跨域请求就不会发生预检请求，比如反向代理）。
+
 54、XSS 与 CSRF 两种跨站攻击
 	xss 跨站脚本攻击（英语：Cross-site Scripting），主要是前端层面的，用户在输入层面插入攻击脚本，改变页面的显示，或则窃取网站 cookie，
 	预防方法：不相信用户的所有操作，对用户输入进行一个转义，不允许 js 对 cookie 的读写
@@ -1035,6 +1048,9 @@
 78、谈一谈你对HTTP/2理解
 		1. 头部压缩
 				HTTP 2.0 使用 HPACK 算法进行压缩。
+				Content-Encoding: gzip
+				HTTP/2.0使用encoder来减少需要传输的头部大小，通讯双方各自cache一份头部 fields表，既避免了重复头部的传输，又减小了需要传输的大小。
+
 		2. 多路复用
 				HTTP 1.x 中，如果想并发多个请求，必须使用多个 TCP 链接，且浏览器为了控制资源，还会对单个域名有 6-8个的TCP链接请求限制。
 				HTTP2中：
@@ -1043,9 +1059,19 @@
 				单个连接可以承载任意数量的双向数据流。
 				数据流以消息的形式发送，而消息又由一个或多个帧组成，多个帧之间可以乱序发送，因为根据帧首部的流标识可以重新组装，也就是Stream ID，流标识符，有了它，接收方就能从乱序的二进制帧中选择ID相同的帧，按照顺序组装成请求/响应报文。
 
+				HTTP/2.0支持多路复用，这是HTTP/1.1持久连接的升级版。多路复用，就是在一个 TCP 连接中可以存在多条流，也就是可以发送多个请求，服务端则可以通过帧中的标识知道该帧属于哪个流（即请求），通过重新排序还原请求。多路复用允许并发的发起多个请求，每个请求及该请求的响应不需要等待其他的请求或响应，避免了线头阻塞问题。这样某个请求任务耗时严重，不会影响到其它连接的正常执行,极大的提高传输性能。
+				
+
+
 		3. 服务器推送（server push）
+				这里的服务端推送指把客户端所需要的css/js/img资源伴随着index.html一起发送到客户端，省去了客户端重复请求的步骤（从缓存中取）。
 
 		4. 二进制分帧
+				基于文本协议的解析存在天然缺陷，文本的表现形式有多样性，要做到全面性考虑的场景必然很多。二进制则不同，只识别0和1的组合。基于这种考虑HTTP/2.0的协议解析采用二进制格式，方便且强大。
+
+				帧：HTTP/2 数据通信的最小单位消息：指 HTTP/2 中逻辑上的 HTTP 消息。例如请求和响应等，消息由一个或多个帧组成。
+
+				流：存在于连接中的一个虚拟通道。流可以承载双向消息，每个流都有一个唯一的整数ID
 
 
 		http1.1 改进:
@@ -1062,7 +1088,7 @@
 						Last-Modified
 						Etag
 
-79、DNS  (域名服务器)
+79、DNS （Domain Name System) (域名服务器)
 		1. DNS域名系统，是应用层协议，运行UDP协议之上，使用端口43。
 		2. 查询过程，本地查询是递归查询，依次通过浏览器缓存 —>> 本地hosts文件 —>> 本地DNS解析器 —>>本地DNS服务器 —>> 其他域名服务器请求。 接下来的过程就是迭代过程。
 		3. 递归查询一般而言，发送一次请求就够，迭代过程需要用户发送多次请求。
@@ -1097,6 +1123,7 @@
 
 84、谈一谈你对URL理解
 		统一资源定位符的简称，Uniform Resource Locator
+		（URI(Uniform Resource Identifier：统一资源标识符)）
 
 		URL 编码
 		URL 只能使用 ASCII 字符集来通过因特网进行发送。
@@ -1144,3 +1171,87 @@
 
 88、谈谈你对原型的理解？
   在 JavaScript 中，每当定义一个对象（函数也是对象）时候，对象中都会包含一些预定义的属性。其中每个函数对象都有一个prototype 属性，这个属性指向函数的原型对象。使用原型对象的好处是所有对象实例共享它所包含的属性和方法。
+
+89、TCP/IP 协议族
+		1. 应用层 比如，FTP（File Transfer Protocol，文件传输协议）、DNS（Domain Name System，域名系统）以及HTTP协议。
+		2. 传输层 在传输层有两个性质不同的协议：TCP（Transmission Control Protocol，传输控制协议）和UDP（User Data Protocol，用户数据报协议）。
+		3. 网络层 网络层规定了数据通过怎样的传输路线到达对方计算机传送给对方（IP协议等）。
+		4. 链路层 用来处理连接网络的硬件部分，包括控制操作系统、硬件的设备驱动、NIC（Network Interface Card，网络适配器，即网卡），及光纤等物理可见部分（还包括连接器等一切传输媒介）。硬件上的范畴均在链路层的作用范围之内。
+
+90、HTTPS和HTTP的区别主要如下
+		1. HTTPS协议需要到CA（证书颁发机构）申请证书，一般免费证书很少，需要交费。
+		2. HTTP协议运行在TCP之上，所有传输的内容都是明文，HTTPS运行在SSL/TLS之上，SSL/TLS运行在TCP之上，所有传输的内容都经过加密的。
+		3. HTTP和HTTPS使用的是完全不同的连接方式，用的端口也不一样，前者是80，后者是443。
+		4. http的连接很简单，是无状态的；HTTPS协议是由HTTP+SSL协议构建的可进行加密传输、身份认证的网络协议，可以有效的防止运营商劫持，解决了防劫持的一个大问题，比http协议安全。
+
+91、页面的缩放系数 = CSS像素 / 设备独立像素
+		视口共包括三种：布局视口、视觉视口和理想视口
+		当页面缩放比例为100%时，CSS像素 = 设备独立像素，理想视口 = 视觉视口。
+
+		1px 问题
+			伪类 + transform
+			 .border_1px:before{
+          content: '';
+          position: absolute;
+          top: 0;
+          height: 1px;
+          width: 100%;
+          background-color: #000;
+          transform-origin: 50% 0%;
+        }
+        @media only screen and (-webkit-min-device-pixel-ratio:2){
+            .border_1px:before{
+                transform: scaleY(0.5);
+            }
+        }
+        @media only screen and (-webkit-min-device-pixel-ratio:3){
+            .border_1px:before{
+                transform: scaleY(0.33);
+            }
+        }
+
+		设置viewport
+		通过设置缩放，让CSS像素等于真正的物理像素。
+		例如：当设备像素比为3时，我们将页面缩放1/3倍，这时1px等于一个真正的屏幕像素。
+		  const scale = 1 / window.devicePixelRatio;
+			const viewport = document.querySelector('meta[name="viewport"]');
+			if (!viewport) {
+					viewport = document.createElement('meta');
+					viewport.setAttribute('name', 'viewport');
+					window.document.head.appendChild(viewport);
+			}
+			viewport.setAttribute('content', 'width=device-width,user-scalable=no,initial-scale=' + scale + ',maximum-scale=' + scale + ',minimum-scale=' + scale);
+			当然，这样做是要付出代价的，这意味着你页面上所有的布局都要按照物理像素来写。这显然是不现实的，这时，我们可以借助flexible或vw、vh来帮助我们进行适配。
+
+		移动端适配方案
+		rem都是按照页面比例来计算的（避开了dpr问题），写px单位时，可以媒体查询写不同的值或者scale不同的比例
+
+		图片模糊问题
+		在dpr > 1的屏幕上，位图的一个像素可能由多个物理像素来渲染，然而这些物理像素点并不能被准确的分配上对应位图像素的颜色，只能取近似值，所以相同的图片在dpr > 1的屏幕上就会模糊
+		1. 使用media查询判断不同的设备像素比来显示不同精度的图片（只适用于背景图）
+		2. 使用window.devicePixelRatio获取设备像素比，，替换图片地址
+		3. 使用svg
+
+92、HTTP有哪些方法
+		HTTP1.0定义了三种请求方法： GET, POST 和 HEAD方法
+		HTTP1.1新增了五种请求方法：OPTIONS, PUT, DELETE, TRACE 和 CONNECT
+		1. GET: 通常用于请求服务器发送某些资源
+		2. HEAD: 请求资源的头部信息, 并且这些头部与 HTTP GET 方法请求时返回的一致. 该请求方法的一个使用场景是在下载一个大文件前先获取其大小再决定是否要下载, 以此可以节约带宽资源
+		3. OPTIONS: 用于获取目的资源所支持的通信选项
+		4. POST: 发送数据给服务器
+		5. PUT: 用于新增资源或者使用请求中的有效负载替换目标资源的表现形式
+		6. DELETE: 用于删除指定的资源
+		7. PATCH: 用于对资源进行部分修改
+		8. CONNECT: HTTP/1.1协议中预留给能够将连接改为管道方式的代理服务器
+		9. TRACE: 回显服务器收到的请求，主要用于测试或诊断
+
+		GET和POST有什么区别
+		1. 数据传输方式不同：GET请求通过URL传输数据，而POST的数据通过请求体传输。
+		2. 安全性不同：POST的数据因为在请求主体内，所以有一定的安全性保证，而GET的数据在URL中，通过历史记录，缓存很容易查到数据信息。
+		3. 数据类型不同：GET只允许 ASCII 字符，而POST无限制
+		4. GET无害： 刷新、后退等浏览器操作GET请求是无害的，POST可能重复提交表单
+		5. 特性不同：GET是安全（这里的安全是指只读特性，就是使用这个方法不会引起服务器状态变化）且幂等（幂等的概念是指同一个请求方法执行多次和仅执行一次的效果完全相同），而POST是非安全非幂等
+
+		PUT和POST都是给服务器发送新增资源，有什么区别
+		1. PUT 和POST方法的区别是,PUT方法是幂等的：连续调用一次或者多次的效果相同（无副作用），而POST方法是非幂等的。
+		2. 除此之外还有一个区别，通常情况下，PUT的URI指向是具体单一资源，而POST可以指向资源集合。
