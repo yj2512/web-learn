@@ -277,7 +277,8 @@
 		b = 20; 
 		console.log(b); 
 	})();
-	答：var b = 10; 
+	答：
+	var b = 10; 
 	(function (){
 		 b = 20;
 		  console.log(b);
@@ -743,7 +744,7 @@
 		直接调用时就是普通函数，通过new创建对象时就是构造函数，通过对象调用时就是方法。
 		对于普通函数，this 始终指向全局对象window；对于构造函数，this则指向新创建的对象；对于方法，this指向调用该方法的对象。另外，Function对象也提供了call、apply 和 bind 等方法来改变函数的 this 指向，其中，call 和 apply 主动执行函数，bind一般在事件回调中使用，而 call 和 apply 的区别只是参数的传递方式不同。
 
-		avascript 是单线程语言。在浏览器中，当JS代码被加载时，浏览器会为其分配一个主线程来执行任务，主线程会在栈中创建一个全局执行环境 （全局作用域）。每当有一个函数进入执行流时，就会形成一个对应的执行环境（函数作用域），并将该执行环境压入栈中。每当一个函数执行完毕以后，对应的执行环境就会从栈中弹出，然后被销毁。这就是执行环境栈，执行环境栈的作用就是保证所有的函数能按照正确的顺序被执行。
+		javascript 是单线程语言。在浏览器中，当JS代码被加载时，浏览器会为其分配一个主线程来执行任务，主线程会在栈中创建一个全局执行环境 （全局作用域）。每当有一个函数进入执行流时，就会形成一个对应的执行环境（函数作用域），并将该执行环境压入栈中。每当一个函数执行完毕以后，对应的执行环境就会从栈中弹出，然后被销毁。这就是执行环境栈，执行环境栈的作用就是保证所有的函数能按照正确的顺序被执行。
 
 49、XMLHttpRequest
 		Ajax是浏览器专门用来和服务器进行交互的异步通讯技术，其核心对象是 XMLHttpRequest
@@ -1255,3 +1256,68 @@
 		PUT和POST都是给服务器发送新增资源，有什么区别
 		1. PUT 和POST方法的区别是,PUT方法是幂等的：连续调用一次或者多次的效果相同（无副作用），而POST方法是非幂等的。
 		2. 除此之外还有一个区别，通常情况下，PUT的URI指向是具体单一资源，而POST可以指向资源集合。
+
+93、package.json和package-lock.json的区别
+		package.json
+		name：项目名，也就是在使用npm init 初始化时取的名字，但是如果使用的是npm init -y 快速初始化的话，那这里的名字就是默认存放这个文件的文件名；
+		version：版本号；
+		private：希不希望授权别人以任何形式使用私有包或未发布的；
+		scripts-serve：是vue的项目启动简写配置；
+		scripts-build：是vue的打包操作简写配置；
+		dependencies：指定了项目运行时所依赖的模块；安装时，加上--save
+		devDependencies：指定项目开发时所需要的模块，也就是在项目开发时才用得上，一旦项目打包上线了，就将移除这里的第三方模块； 安装时，加上--save-dev
+
+		package-lock.json是在运行“npm install”时生成的一个文件，用于记录当前状态下项目中实际安装的各个package的版本号、模块下载地址、及这个模块又依赖了哪些依赖。
+
+		为什么有了package.json，还需要package-lock.json文件呢，当node_modules文件夹并不存在或被删除时，需要用到npm install重新装载全部依赖时，通过package-lock.json可以直接表明下载地址和相关依赖，相对下载速度也更快，也不容易报错。
+
+94、flex: 1
+		flex: flex-grow flex-shrink flex-basis|auto|initial|inherit;
+
+95、文件断点续传
+
+96、函数柯里化
+	function currying(fn) {
+			// args 获取第一个方法内的全部参数
+			var args = Array.prototype.slice.call(arguments, 1)
+			return function() {
+					// 将后面方法里的全部参数和args进行合并
+					var newArgs = args.concat(Array.prototype.slice.call(arguments))
+					// 把合并后的参数通过apply作为fn的参数并执行
+					return fn.apply(this, newArgs)
+			}
+		}
+
+97、this指向
+		var length = 10;
+		function fn(){
+			console.log(this.length)
+		}
+		var obj = {
+			length: 5,
+			method: function(fn){
+				fn()
+				arguments[0]()
+			}
+		}
+		obj.method(fn,1)
+
+	答：	10，2
+				10是因为fn()的调用者为window
+				2是因为arguments[0]()的调用者为arguments，而arguments为类数组，具有length属性
+
+98、webpack优化
+	减少Webpack打包时间
+		1. exclude:/node_modules/
+		2. HappyPack
+				HappyPack可以将Loader的同步执行转换为并行的
+	
+	减少Webpack打包后的文件体积
+		1. 按需加载
+		2. Tree Shaking 可以实现删除项目中未被引用的代码
+			webpack4的话，开启生产环境就会自动启动这个优化功能。
+		3. 提取公共代码
+		4. Scope Hoisting
+				Scope Hoisting会分析出模块之间的依赖关系，尽可能的把打包出来的模块合并到一个函数中去。
+		5. UglifyJsPlugin 压缩代码
+		6. devtool: 'cheap-module-source-map',
