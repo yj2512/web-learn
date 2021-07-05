@@ -6,3 +6,6 @@
   
 3、font- weight
   Android仅支持bold的值，不支持数字
+
+4、cookie
+  相关数据会在请求头中自动携带，如果设置了httpOnly则无法通过document.cookie读取。Domain为cookie的作用域，path为有权限的文件范围，path默认值是‘/’
