@@ -11,4 +11,4 @@
   相关数据会在请求头中自动携带，如果设置了httpOnly则无法通过document.cookie读取。Domain为cookie的作用域，path为有权限的文件范围，path默认值是‘/’
 
 5、vuex
-  state数据会在刷新页面丢失，不适用于对接口入参对存储
+  state数据会在刷新页面丢失，不适用于对接口入参的存储
