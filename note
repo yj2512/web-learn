@@ -1,0 +1,8 @@
+1、document.title
+  在移动端-ios中只会触发一次，不适合用于设置动态标题，iOS动态标题需要配合createElement动态创建iframe标签设置
+  
+2、new Date()
+  相关API的参数，ios仅支持2021/07/05的斜杠（/）格式，Android对于2021-07-05的横杠格式也支持
+  
+3、font- weight
+  Android仅支持bold的值，不支持数字
