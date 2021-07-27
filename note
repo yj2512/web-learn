@@ -12,3 +12,16 @@
 
 5、vuex
   state数据会在刷新页面丢失，不适用于对接口入参的存储
+
+6、移动端点击出现阴影
+  body加样式
+  html,
+  body {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+7、iOS伪类:actice（button:active的点击效果）无效
+   给body加touchstart的事件监听document.body.addEventListener('touchstart', function () {})
+   
+8、移动端的1px边框
+   :after{}伪元素200%宽高，1px边框。然后scale（0.5）缩放
