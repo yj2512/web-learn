@@ -24,4 +24,4 @@
    给body加touchstart的事件监听document.body.addEventListener('touchstart', function () {})
    
 8、移动端的1px边框
-   :after{}伪元素200%宽高，1px边框。然后scale（0.5）缩放
+   :after{}伪元素200%宽高，1px边框。然后scale（0.5）缩放，注意加pointer-events: none;
