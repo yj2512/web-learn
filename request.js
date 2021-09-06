@@ -21,7 +21,7 @@ const service = axios.create({
   withCredentials: true,
   timeout: 5000,
   headers: {
-    'X-Gaia-Api-Key': process.env.VUE_APP_KEY,
+    'X-Api-Key': process.env.VUE_APP_KEY,
   },
 })
 
