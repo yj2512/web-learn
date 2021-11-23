@@ -1,0 +1,561 @@
+1、 消息摘要算法 ，对文件求摘要信息，摘要信息与文件内容一一对应，就有了一种可以精确到单个文件粒度的缓存控制依据（可以称这种这个方式为 query-hash）
+  query-hash： foo.css?v=1 (覆盖式发布) (全量部署)
+  name-hash: foo.1.css  (非覆盖式发布) (灰度部署)
+  为了解决覆盖式发布引发的问题，采用 name-hash 而非 query-hash 的组织方式，具体需要配置 Wbpack 的 output.filename 为 contenthash 。
+
+  Q：如何避免前端上线，影响未刷新页面的用户？
+  A：使用name-hash方式组织静态资源，先上线静态资源，再上线HTML。
+
+2、hash、chunkhash、contenthash
+  webpack打包时的hash有三种：fullhash（webpack4.x版本及之前为 hash，webpack5.x中使用 fullhash 和 hash 均可）、chunkhash 和 contenthash 
+  (1) fullhash是全量的hash，是整个项目级别的。只要项目中有任何一个的文件内容发生变动，打包后所有文件的hash值都会发生改变，所有文件的文件名中的 hash 值都是一样的
+  (2) chunkhash根据不同的入口文件(entry)进行依赖文件解析、构建对应的chunk，生成对应的哈希值。当某个文件内容发生变动时，再次执行打包，只有该文件以及依赖该文件的文件的打包结果 hash 值会发生改变
+  (3) contenthash 是只有当文件自己的内容发生改变时，其打包的 hash 值才会发生变动。
+
+  在生产环境下，我们对 output 中打包的文件名一般采用 chunkhash，对于 css 等样式文件，采用 contenthash，这样可以使得各个模块最小范围的改变打包 hash 值。
+  一方面，可以最大程度地利用浏览器缓存机制，提升用户的体验；另一方面，合理利用 hash 也减少了 webpack 再次打包所要处理的文件数量，提升了打包速度。
+
+3、xss
+  获取页面的数据，如DOM、cookie、localStorage；
+  DOS攻击，发送合理请求，占用服务器资源，从而使用户无法访问服务器；
+  破坏页面结构；
+  流量劫持（将链接指向某网站）；
+
+4、网络劫持有哪几种，如何防范？
+  (1) DNS劫持: (输⼊京东被强制跳转到淘宝这就属于dns劫持)
+      DNS强制解析: 通过修改运营商的本地DNS记录，来引导⽤户流量到缓存服务器
+      302跳转的⽅式: 通过监控⽹络出⼝的流量，分析判断哪些内容是可以进⾏劫持处理的,再对劫持的内存发起302跳转的回复，引导⽤户获取内容
+
+  (2) HTTP劫持: (访问⾕歌但是⼀直有贪玩蓝⽉的⼴告),由于http明⽂传输,运营商会修改你的http响应内容(即加⼴告)
+
+  DNS劫持由于涉嫌违法，已经被监管起来，现在很少会有DNS劫持，⽽http劫持依然⾮常盛⾏，最有效的办法就是全站HTTPS，将HTTP加密，这使得运营商⽆法获取明⽂，就⽆法劫持你的响应内容。
+
+5、 点击刷新按钮或者按 F5、按 Ctrl+F5 （强制刷新）、地址栏回车有什么区别？
+  点击刷新按钮或者按 F5： 浏览器直接对本地的缓存文件过期，但是会带上If-Modifed-Since，If-None-Match，这就意味着服务器会对文件检查新鲜度，返回结果可能是 304，也有可能是 200。
+
+  用户按 Ctrl+F5（强制刷新）： 浏览器不仅会对本地文件过期，而且不会带上 If-Modifed-Since，If-None-Match，相当于之前从来没有请求过，返回结果是 200。
+
+  地址栏回车： 浏览器发起请求，按照正常流程，本地检查是否过期，然后服务器检查新鲜度，最后返回内容。
+
+6、cookie 
+  服务器端可以使用 Set-Cookie 的响应头部来配置 cookie 信息。一条cookie 包括了5个属性值 expires、domain、path、secure、HttpOnly。其中 expires 指定了 cookie 失效的时间，domain 是域名、path是路径，domain 和 path 一起限制了 cookie 能够被哪些 url 访问。secure 规定了 cookie 只能在确保安全的情况下传输，HttpOnly 规定了这个 cookie 只能被服务器访问，不能使用 js 脚本访问。
+
+7、IndexedDB
+  被正式纳⼊HTML5标准的数据库储存⽅案，它是NoSQL数据库，⽤键值对进⾏储存，可以进⾏快速读取操作，⾮常适合web场景，同时⽤JavaScript进⾏操作会⾮常便。
+
+  IndexedDB 具有以下特点：
+
+  （1）键值对储存：IndexedDB 内部采用对象仓库（object store）存放数据。所有类型的数据都可以直接存入，包括 JavaScript 对象。对象仓库中，数据以"键值对"的形式保存，每一个数据记录都有对应的主键，主键是独一无二的，不能有重复，否则会抛出一个错误。
+  （2）异步
+  （3）同源限制
+  （4）储存空间大：IndexedDB 的储存空间比 LocalStorage 大得多，一般来说不少于 250MB，甚至没有上限。
+  （5）支持二进制储存：IndexedDB 不仅可以储存字符串，还可以储存二进制数据（ArrayBuffer 对象和 Blob 对象）。
+
+8、预检请求
+  头信息中的关键字段是Orign，表示请求来自哪个源。除此之外，头信息中还包括两个字段：
+
+  Access-Control-Request-Method：该字段是必须的，用来列出浏览器的CORS请求会用到哪些HTTP方法。
+  Access-Control-Request-Headers： 该字段是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段。
+
+  服务器在收到浏览器的预检请求之后，会根据头信息的三个字段来进行判断，如果返回的头信息在中有Access-Control-Allow-Origin这个字段就是允许跨域请求，如果没有，就是不同意这个预检请求，就会报错。
+
+  减少OPTIONS请求次数：
+  OPTIONS请求次数过多就会损耗页面加载的性能，降低用户体验度。所以尽量要减少OPTIONS请求次数，可以后端在请求的返回头部添加：Access-Control-Max-Age：number。它表示预检请求的返回结果可以被缓存多久，单位是秒。该字段只对完全一样的URL的缓存设置生效，所以设置了缓存时间，在这个时间范围内，再次发送请求就不需要进行预检请求了。
+
+9、vuex
+  dispatch∶操作行为触发方法，是唯一能执行action的方法。
+  commit∶状态改变提交操作方法。对mutation进行提交，是唯一能执行mutation的方法。
+
+  Vuex中action和mutation的区别
+    mutation的参数是state，action的参数是context
+    mutation中的操作是一系列的同步函数，用于修改state中的变量的的状态。
+
+    Action 函数接受一个与 store 实例具有相同方法和属性的 context 对象，因此你可以调用 context.commit 提交一个 mutation，或者通过 context.state 和 context.getters 来获取 state 和 getters。
+    const store = new Vuex.Store({
+      state: {
+        count: 0
+      },
+      mutations: {
+        increment (state) {
+          state.count++
+        }
+      },
+      actions: {
+        increment (context) {
+          context.commit('increment')
+        }
+      }
+    })
+
+    Vuex 和 localStorage 的区别
+      vuex存储在内存中
+      localstorage 则以文件的方式存储在本地，只能存储字符串类型的数据
+      Vuex能做到数据的响应式，localstorage不能
+      刷新页面时vuex存储的值会丢失，localstorage不会。
+
+    import {mapGetters} from 'vuex'
+     import {mapActions} from 'vuex'
+    import { mapMutations } from 'vuex'
+
+10、Vue 3.0 中的 Vue Composition API
+    在 Vue2 中，代码是 Options API 风格的，也就是通过填充 (option) data、methods、computed 等属性来完成一个 Vue 组件
+    Composition API本质上是将 Options API 背后的机制暴露给用户直接使用，这样用户就拥有了更多的灵活性，也使得 Vue3 更适合于 TypeScript 结合。Vue Composition API 使得 Vue3 的开发风格更接近于原生 JavaScript
+
+11、虚拟DOM
+    通过事务处理机制，将多次DOM修改的结果一次性的更新到页面上，从而有效的减少页面渲染的次数，减少修改DOM的重绘重排次数，提高渲染性能。
+
+    真实DOM∶ 生成HTML字符串＋重建所有的DOM元素
+    虚拟DOM∶ 生成vNode+ DOMDiff＋必要的dom更新
+
+    Vue中key的作用
+    key 是为 Vue 中 vnode 的唯一标记，通过这个 key，diff 操作可以更准确、更快速
+
+    更准确：因为带 key 就不是就地复用了，在 sameNode 函数a.key === b.key对比中可以避免就地复用的情况。所以会更加准确。
+    更快速：利用 key 的唯一性生成 map 对象来获取对应节点，比遍历方式更快
+
+12、 Computed 和 Watch 的区别
+    computed的值会默认走缓存，计算属性是基于它们的响应式依赖进行缓存的，也就是基于data声明过，或者父组件传递过来的props中的数据进行计算的。
+    如果computed属性的属性值是函数，那么默认使用get方法，函数的返回值就是属性的属性值；在computed中，属性有一个get方法和一个set方法，当数据发生变化时，会调用set方法。
+
+    Watch不支持缓存
+    监听数据必须是data中声明的或者父组件传递过来的props中的数据，当发生变化时，会触发其他操作，函数有两个的参数：immediate，deep
+
+13、filters
+    使用场景：
+      需要格式化数据的情况，比如需要处理时间、价格等数据格式的输出 / 显示。
+      比如后端返回一个 年月日的日期字符串，前端需要展示为 多少天前 的数据格式，此时就可以用fliters过滤器来处理数据。
+      过滤器是一个函数，它会把表达式中的值始终当作函数的第一个参数。过滤器用在插值表达式 {{ }} 和 v-bind 表达式 中，然后放在操作符“ | ”后面进行指示。
+
+      例如，在显示金额，给商品价格添加单位：
+      <li>商品价格：{{item.price | filterPrice}}</li>
+
+      filters: {
+          filterPrice (price) {
+            return price ? ('￥' + price) : '--'
+          }
+        }
+
+14、keep-alive有以下三个属性：
+    include 
+    exclude 
+    max 数字，最多可以缓存多少组件实例。
+
+    keep-alive 具体是通过 cache 数组缓存所有组件的 vnode 实例。当 cache 内原有组件被使用时会将该组件 key 从 keys 数组中删除，然后 push 到 keys数组最后，以便清除最不常用组件。
+
+    LRU （least recently used）缓存策略
+    LRU 缓存策略∶ 从内存中找出最久未使用的数据并置换新的数据。
+    LRU（Least rencently used）算法根据数据的历史访问记录来进行淘汰数据，其核心思想是 "如果数据最近被访问过，那么将来被访问的几率也更高"。 最常见的实现是使用一个链表保存缓存数据，详细算法实现如下∶
+
+    新数据插入到链表头部
+    每当缓存命中（即缓存数据被访问），则将数据移到链表头部
+    链表满的时候，将链表尾部的数据丢弃。
+
+15、$nextTick 原理及作用
+    本质是对 JavaScript 执行原理 EventLoop 的一种应用。
+    核心是利用了如 Promise 、MutationObserver、setImmediate、setTimeout（//定义异步方法  采用优雅降级）的原生 JavaScript 方法来模拟对应的微/宏任务的实现
+
+
+    在以下情况下，会用到nextTick：
+
+    在数据变化后执行的某个操作，而这个操作需要使用随数据变化而变化的DOM结构的时候，这个操作就需要方法在nextTick()的回调函数中。
+    在vue生命周期中，如果在created()钩子进行DOM操作，也一定要放在nextTick()的回调函数中。
+
+16、mixin
+    据一个通用 Vue 实例所包含的选项进行分类逐一判断合并，如 props、data、 methods、watch、computed、生命周期等，将合并结果存储在新定义的 options 对象里。
+    返回合并结果 options。
+
+17、Vue自定义指令
+    全局定义：Vue.directive("focus",{})
+    局部定义：directives:{focus:{}}
+
+    钩子函数：指令定义对象提供钩子函数
+    bind
+    inSerted
+    update
+    ComponentUpdate
+    unbind
+
+    钩子函数参数 o el：绑定元素
+
+    v-focus
+    v-loading
+    v-lazy
+
+18、template 到 render 的过程
+    template 到 render 的过程，模版编译过程主要如下：template -> ast -> render函数
+    （1）调用parse方法将template转化为ast（抽象语法树）
+        constast = parse(template.trim(), options)
+        使用大量的正则表达式对template字符串进行解析，将标签、指令、属性等转化为抽象语法树AST。
+    （2）对静态节点做优化
+        optimize(ast,options)
+
+        这个过程主要分析出哪些是静态节点，给其打一个标记，为后续更新渲染可以直接跳过静态节点做优化
+
+        深度遍历AST，查看每个子树的节点元素是否为静态节点或者静态节点根。如果为静态节点，他们生成的DOM永远不会改变，这对运行时模板更新起到了极大的优化作用。
+        遍历AST，找到其中的一些静态节点并进行标记，方便在页面重渲染的时候进行diff比较时，直接跳过这一些静态节点，优化runtime的性能。
+    （3）生成代码
+        const code = generate(ast, options)
+        将最终的AST转化为render函数字符串。
+
+19、 Vue的性能优化有哪些
+（1）编码阶段
+    尽量减少data中的数据，data中的数据都会增加getter和setter，会收集对应的watcher
+    v-if和v-for不能连用
+    如果需要使用v-for给每项元素绑定事件时使用事件代理
+    SPA 页面采用keep-alive缓存组件
+    在更多的情况下，使用v-if替代v-show
+    key保证唯一
+    使用路由懒加载、异步组件
+    防抖、节流
+    第三方模块按需导入
+    长列表滚动到可视区域动态加载
+    图片懒加载
+
+（2）SEO优化
+    预渲染
+    服务端渲染SSR
+
+（3）打包优化
+    压缩代码（UglifyJS ）
+    Tree Shaking/Scope Hoisting
+    使用cdn加载第三方模块
+    多线程打包happypack（HappyPack 可以将 Loader 的同步执行转换为并行的）
+    splitChunks抽离公共文件
+    sourceMap优化（ productionSourceMap: false,）
+
+    Scope Hoisting 会分析出模块之间的依赖关系，尽可能的把打包出来的模块合并到一个函数中去。
+    Tree Shaking 可以实现删除项目中未被引用的代码
+    多⼊⼝情况下，使⽤ CommonsChunkPlugin 来提取公共代码
+
+（4）用户体验
+    骨架屏
+    PWA
+    还可以使用缓存(客户端缓存、服务端缓存)优化、服务端开启gzip压缩等。
+
+20、CDN的作用
+    CDN一般会用来托管Web资源（包括文本、图片和脚本等），可供下载的资源（媒体文件、软件、文档等），应用程序（门户网站等）。使用CDN来加速这些资源的访问。
+    CDN作为一种基础的云服务，同样具有资源托管、按需扩展（能够应对流量高峰）等方面的优势。
+
+    CDN 如何保证数据节点的更新和同步
+    1. 主动刷新，清空缓存，后续的访问会回源，拉取最新数据
+    2. 设置CDN在缓存的时候，不忽略参数， 即，缓存的key为完整的URI
+    如果想要访问到最新的资源，可以通过在请求URI后面带上不同的参数，然后请求到CDN节点的时候会直接回源，拉取到最新的资源
+
+21、懒加载（延迟加载，按需加载）
+    图片，路由组件，接口请求（树结构）
+    图片：图片的加载是由src引起的，data-xxx属性来储存图片的路径，
+        window.innerHeight
+        document.body.scrollTop || document.documentElement.scrollTop
+        imgs.offsetTop 
+        图片加载条件：img.offsetTop < window.innerHeight + document.body.scrollTop;
+
+22、预加载指的是将所需的资源提前请求加载到本地，这样后面在需要用到时就直接从缓存取资源
+
+23、HTTP 3.0
+    HTTP/3基于UDP协议实现了类似于TCP的多路复用数据流、传输可靠性等功能，这套功能被称为QUIC协议。
+    （1）流量控制、传输可靠性功能：QUIC在UDP的基础上增加了一层来保证数据传输可靠性，它提供了数据包重传、拥塞控制、以及其他一些TCP中的特性。
+    （2）集成TLS加密功能：目前QUIC使用TLS1.3，减少了握手所花费的RTT数。
+    （3）多路复用：同一物理连接上可以有多个独立的逻辑数据流，实现了数据流的单独传输，解决了TCP的队头阻塞问题。
+
+24、TLS/SSL的工作原理
+    TLS/SSL全称安全传输层协议（Transport Layer Security）, 是介于TCP和HTTP之间的一层安全协议，不影响原有的TCP协议和HTTP协议，所以使用HTTPS基本上不需要对HTTP页面进行太多的改造。
+
+    TLS/SSL的功能实现主要依赖三类基本算法：散列函数hash、对称加密、非对称加密。
+    基于散列函数验证信息的完整性
+    对称加密算法采用协商的秘钥对数据加密
+    非对称加密实现身份认证和秘钥协商
+
+    常见的散列函数有MD5、SHA1、SHA256。
+
+25、TCP和UDP的区别
+    UDP
+    支持一对一，一对多，多对一和多对多交互通信
+    UDP 的首部只有 8 字节
+    不可靠传输，不使用流量控制和拥塞控制
+    适用于实时应用，例如视频会议、直播
+
+    TCP
+    只能是一对一通信
+    TCP 的首部较大为 20 字节
+    可靠传输（数据顺序和正确性），使用流量控制和拥塞控制
+    适用于要求可靠传输的应用，例如文件传输
+
+26、三次握手（Three-way Handshake）其实就是指建立一个TCP连接时，需要客户端和服务器总共发送3个包。进行三次握手的主要作用就是为了确认双方的接收能力和发送能力是否正常、指定自己的初始化序列号为后面的可靠性传送做准备。实质上其实就是连接服务器指定端口，建立TCP连接，并同步连接双方的序列号和确认号，交换TCP窗口大小信息。
+
+27、操作DOM元素有哪些方法
+    createElement
+    appendChild
+    insertBefore
+    removeChild
+    replaceChild
+    getAttribute 获取节点的属性
+    setAttribute 设置节点属性
+    romoveAttribute 删除节点属性
+28、Object.defineProperty(target, key, options)，options可传什么参数？
+    value：给target[key]设置初始值
+    get：调用target[key]时触发
+    set：设置target[key]时触发
+    writable：规定target[key]是否可被重写，默认false
+    enumerable：规定了key是否会出现在target的枚举属性中，默认为false
+    configurable：规定了能否改变options，以及删除key属性，默认false
+
+    new Proxy(target, options)
+
+29、Symbol的应用场景
+    1. 使用Symbol来作为对象属性名
+    const gender = Symbol('gender')
+    const obj = {
+      name: 'Sunshine_Lin',
+      age: 23,
+      [gender]: '男'
+    }
+    console.log(obj[gender]) // 男
+
+    但是Symbol作为属性的属性不会被枚举出来，这也是JSON.stringfy(obj)时，Symbol属性会被排除在外的原因
+    console.log(Object.keys(obj)) // [ 'name', 'age' ]
+    for(const key in obj) {
+      console.log(key) // name age
+    }
+    console.log(JSON.stringify(obj)) // {"name":"Sunshine_Lin","age":23}
+
+    其实想获取Symbol属性
+    // 方法一
+    console.log(Object.getOwnPropertySymbols(obj)) // [ Symbol(gender) ]
+    // 方法二
+    console.log(Reflect.ownKeys(obj)) // [ 'name', 'age', Symbol(gender) ]
+
+30、Commonjs 和 ES6 Module的区别
+    module.exports  require
+    export  export default import
+
+    Commonjs (node环境)
+    ES6 Module(浏览器环境)
+
+    1. Commonjs是拷贝(浅拷贝)输出，ES6模块化是引用输出
+    2. Commonjs是运行时加载，ES6模块化是编译时输出接口
+    3. Commonjs是单个值导出，ES6模块化可以多个值导出
+    4. Commonjs是动态语法可写在函数体中，ES6模块化静态语法只能写在顶层
+    5. Commonjs的this是当前模块化，ES6模块化的this是undefined
+
+31、forEach是不能通过break或者return来实现跳出循环的
+
+32、DOMContentLoaded
+    当初始的 HTML 文档被完全加载和解析完成之后，DOMContentLoaded 事件被触发，而无需等待样式表、图像和子框架的完全加载。
+
+33、Promise
+    Promise.prototype.then()
+    Promise.prototype.catch()
+    Promise.prototype.finally()
+
+    Promise.resolve() 
+    Promise.resolve() 
+
+    Promise.all()
+    Promise.race([p1,p2]) // 第一个出结果就行
+    Promise.any()  // 只要参数实例有一个变成fulfilled状态，包装实例就会变成fulfilled状态；如果所有参数实例都变成rejected状态，包装实例就会变成rejected状态。
+
+34、加载顺序： props->methods->data->computed->watch
+  // 源码
+  function initState (vm) {
+        vm._watchers = [];
+        var opts = vm.$options;
+        if (opts.props) { initProps(vm, opts.props); }
+        if (opts.methods) { initMethods(vm, opts.methods); }
+        if (opts.data) {
+            initData(vm);
+        } else {
+            observe(vm._data = {}, true /* asRootData */);
+        }
+        if (opts.computed) { initComputed(vm, opts.computed); }
+        if (opts.watch && opts.watch !== nativeWatch) {
+            initWatch(vm, opts.watch);
+        }
+    }
+
+35、DNS存在着多级缓存，从离浏览器的距离排序的话，有以下几种: 浏览器缓存，系统缓存，路由器缓存，IPS服务器缓存，根域名服务器缓存，顶级域名服务器缓存，主域名服务器缓存。
+
+36、 webpack Plugin 和 Loader 的区别
+    1. loader是文件加载器（转换器）
+    用于对模块源码的转换，loader 描述了 webpack 如何处理非 javascript 模块，并且在 build 中引入这些依赖。
+    2. Plugin（扩展器）
+    在webpack运行的生命周期中会广播出许多事件，plugin可以监听这些事件，在合适的时机通过webpack提供的API改变输出结果。
+
+37、 事件循环
+  setTimeout(function () {
+    console.log("1");
+  }, 0);
+  async function async1() {
+    console.log("2");
+    const data = await async2();
+    console.log("3");
+    return data;
+  }
+  async function async2() {
+    return new Promise((resolve) => {
+      console.log("4");
+      resolve("async2的结果");
+    }).then((data) => {
+      console.log("5");
+      return data;
+    });
+  }
+  async1().then((data) => {
+    console.log("6");
+    console.log(data);
+  });
+  new Promise(function (resolve) {
+    console.log("7");
+    //   resolve()
+  }).then(function () {
+    console.log("8");
+  });
+
+  输出结果：247536 async2的结果 1
+
+38、 flex:1 是哪些属性组成的
+    flex 实际上是 flex-grow、flex-shrink 和 flex-basis 三个属性的缩写。
+    flex-grow：定义项目的的放大比例；
+    flex-shrink：定义项目的缩小比例；
+
+    flex-basis： 定义在分配多余空间之前，项目占据的主轴空间（main size），浏览器根据此属性计算主轴是否有多余空间
+    默认值为auto，即 项目原本大小；
+
+39、为什么官方要说 Vue 没有完全遵循 MVVM 思想呢？
+    严格的 MVVM 要求 View 不能和 Model 直接通信，而 Vue 提供了$refs 这个属性，让 Model 可以直接操作 View，违反了这一规定，所以说 Vue 没有完全遵循 MVVM。
+
+40、 Vue 组件通讯
+    $refs 获取组件实例，可以操作子组件方法
+
+41、ssr 不支持 beforeMount 、mounted 钩子函数，所以放在 created 中有助于一致性
+
+42、虚拟 DOM 是什么 有什么优缺点
+    优点
+    1. 保证性能下限
+    2. 无需手动操作 DOM
+    3. 跨平台
+
+    缺点
+    1. 无法进行极致优化
+    2. 首次渲染大量 DOM 时，由于多了一层虚拟 DOM 的计算，会比 innerHTML 插入慢
+
+43、Vuex 分模块并且加命名空间
+    namespaced: true
+
+44、 Vue 修饰符有哪些
+
+    1. 事件修饰符
+    .stop 阻止事件继续传播
+    .prevent 阻止标签默认行为
+    .capture 使用事件捕获模式,即元素自身触发的事件先在此处处理，然后才交由内部元素进行处理
+    .self 只当在 event.target 是当前元素自身时触发处理函数
+    .once 事件将只会触发一次
+    .passive 告诉浏览器你不想阻止事件的默认行为
+
+    <!-- 提交事件不再重载页面 -->
+    <form v-on:submit.prevent="onSubmit"></form>
+
+    <!-- 修饰符可以串联 -->
+    <a v-on:click.stop.prevent="doThat"></a>
+
+    2. v-model 的修饰符
+      .lazy 通过这个修饰符，转变为在 change 事件再同步
+      .number 自动将用户的输入值转化为数值类型
+      .trim 自动过滤用户输入的首尾空格
+
+    3. 键盘事件的修饰符
+      .enter
+      .tab
+      .delete (捕获“删除”和“退格”键)
+      .esc
+      .space
+      .up
+      .down
+      .left
+      .right
+
+45、css
+    1. 使用overflow-scrolling支持弹性滚动
+      body {
+         -webkit-overflow-scrolling: touch;
+      }
+    
+    2. 使用transform启动GPU硬件加速
+      .elem {
+        transform: translate3d(0, 0, 0); /* translateZ(0)亦可 */
+      }
+
+    3. 使用pointer-events禁用事件触发
+
+    4. 使用vw定制rem自适应布局
+      html {
+        font-size: calc(100vw / 7.5);
+      }
+
+46、长列表性能优化（纯粹的数据展示，一旦被冻结的对象就再也不能被修改了）
+    export default {
+      data: () => ({
+        users: {}
+      }),
+      async created() {
+        const users = await axios.get("/api/users");
+        this.users = Object.freeze(users);
+      }
+    };
+
+    优化无限列表性能
+    非常长或者无限滚动的列表，那么需要采用 窗口化 的技术来优化性能，只需要渲染少部分区域的内容，减少重新渲染组件和创建 dom 节点的时间。
+    vue-virtual-scroll-list 和 vue-virtual-scroller 来优化这种无限列表的场景的
+
+47、使用 Chrome Performance 查找性能瓶颈
+
+48、 Bigint和Number的区别
+    Number类型的数字有精度限制，数值的精度只能到 53 个二进制位（相当于 16 个十进制位, 正负9007199254740992）
+
+    Bigint没有位数的限制，任何位数的整数都可以精确表示。但是其只能用于表示整数，且为了与Number进行区分，BigInt 类型的数据必须添加后缀n。BigInt 可以使用负号（-），但是不能使用正号（+）。
+    另外number类型的数字和Bigint类型的数字不能混合计算。
+
+49、那为什么推崇使用post来处理敏感数据呢？
+  因为get的记录会保存在浏览器，上网日志中，而使用Post，因为数据不会记录存储在浏览器的记录和网址访问记录中，这样会有更大的安全性。
+
+50、栈和队列的区别：
+    1. 栈只允许在表尾一端进行插入和删除，队列只允许在表尾一端进行插入，在表头一端进行删除。
+    2. 栈是先进后出，队列是先进先出。
+
+51、instanceof只能正确判断引用数据类型，而不能判断基本数据类型。
+    console.log([] instanceof Array);                    // true
+    console.log(function(){} instanceof Function);       // true
+    console.log({} instanceof Object);                   // true
+
+    console.log(2 instanceof Number);                    // false
+    console.log(true instanceof Boolean);                // false 
+    console.log('str' instanceof String);                // false 
+
+52、 Object.prototype.toString.call()
+
+53、isNaN 和 Number.isNaN 函数的区别？
+    函数 isNaN 接收参数后，会尝试将这个参数转换为数值，任何不能被转换为数值的的值都会返回 true，因此非数字值传入也会返回 true ，会影响 NaN 的判断。
+    函数 Number.isNaN 会首先判断传入参数是否为数字，如果是数字再继续判断是否为 NaN ，不会进行数据类型的转换，这种方法对于 NaN 的判断更为准确。
+
+54、 箭头函数与普通函数的区别
+    （1）箭头函数比普通函数更加简洁
+    （2）箭头函数没有自己的this
+    （3）箭头函数继承来的this指向永远不会改变
+    （4）call()、apply()、bind()等方法不能改变箭头函数中this的指向
+    （5）箭头函数不能作为构造函数使用
+    （6）箭头函数没有自己的arguments
+    （7）箭头函数没有prototype
+    （8）箭头函数不能用作Generator函数，不能使用yeild关键字
+
+55、[...'hello']    // [ "h", "e", "l", "l", "o" ]
+
+
+
+
+
+
+
+
+
+
+
+      
